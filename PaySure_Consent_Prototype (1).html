@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PaySure — Consent by Design (Clickable Prototype)</title>
+<style>
+  :root{
+    --teal-deep:#0B3D3E;
+    --teal:#028090;
+    --seafoam:#00A896;
+    --mint:#02C39A;
+    --ink:#142B2C;
+    --muted:#5B7379;
+    --paper:#FBFDFC;
+    --tint:#EAF6F6;
+    --tint2:#DFF3F1;
+    --line:#DCEBEA;
+    --lock:#9A6B12;
+    --white:#FFFFFF;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: radial-gradient(circle at 20% 20%, #12484A 0%, #07282A 60%, #041818 100%);
+    font-family: Georgia, 'Times New Roman', serif;
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:32px 16px 60px;
+  }
+  .intro{
+    max-width:520px;
+    text-align:center;
+    color:#CFEAE7;
+    margin-bottom:22px;
+  }
+  .intro .eyebrow{
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    letter-spacing:2.5px;
+    font-size:11px;
+    color:var(--mint);
+    text-transform:uppercase;
+    font-weight:600;
+  }
+  .intro h1{
+    font-size:26px;
+    margin:8px 0 6px;
+    color:#F4FBFA;
+  }
+  .intro p{
+    font-family:'Segoe UI', system-ui, sans-serif;
+    font-size:13.5px;
+    color:#AEDAD5;
+    line-height:1.5;
+    margin:0;
+  }
+
+  .rig{
+    display:flex;
+    gap:34px;
+    align-items:flex-start;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+
+  /* ---------- Phone frame ---------- */
+  .phone{
+    width:340px;
+    height:700px;
+    background:var(--teal-deep);
+    border-radius:42px;
+    padding:14px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.04);
+    position:relative;
+  }
+  .phone::before{
+    content:"";
+    position:absolute;
+    top:14px; left:50%; transform:translateX(-50%);
+    width:90px; height:20px;
+    background:var(--teal-deep);
+    border-radius:0 0 14px 14px;
+    z-index:5;
+  }
+  .screen-wrap{
+    width:100%; height:100%;
+    background:var(--paper);
+    border-radius:30px;
+    overflow:hidden;
+    position:relative;
+    font-family:'Segoe UI', system-ui, sans-serif;
+  }
+  .status-bar{
+    height:34px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 22px;
+    font-size:11px;
+    color:var(--ink);
+    font-weight:600;
+  }
+  .screen{
+    position:absolute;
+    top:34px; left:0; right:0; bottom:0;
+    padding:18px 20px 20px;
+    overflow-y:auto;
+    display:none;
+    animation: fadeIn .25s ease;
+  }
+  .screen.active{display:block;}
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  .topbar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .backbtn{
+    width:30px;height:30px;border-radius:50%;
+    background:var(--tint);
+    border:none;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    color:var(--teal-deep);
+    font-size:15px;
+  }
+  .screen-title{
+    font-family: Georgia, serif;
+    font-size:19px;
+    font-weight:700;
+    color:var(--ink);
+  }
+
+  .dots{ display:flex; gap:6px; margin:2px 0 20px; }
+  .dot{ width:7px;height:7px;border-radius:50%; background:var(--line); }
+  .dot.on{ background:var(--seafoam); }
+
+  .brand-mark{
+    width:54px;height:54px;border-radius:16px;
+    background:linear-gradient(135deg, var(--teal), var(--teal-deep));
+    display:flex;align-items:center;justify-content:center;
+    color:white; font-family:Georgia,serif; font-size:22px; font-weight:700;
+    margin-bottom:14px;
+  }
+
+  .btn{
+    width:100%;
+    padding:13px 16px;
+    border-radius:12px;
+    border:none;
+    font-size:14.5px;
+    font-weight:600;
+    font-family:'Segoe UI', system-ui, sans-serif;
+    cursor:pointer;
+    transition: transform .12s ease, opacity .12s ease;
+  }
+  .btn:active{ transform:scale(0.98); }
+  .btn-primary{ background:var(--teal); color:white; }
+  .btn-primary:hover{ background:#016E7A; }
+  .btn-ghost{ background:transparent; color:var(--teal); border:1.4px solid var(--line); }
+  .btn-text{ background:none; border:none; color:var(--teal); font-size:13px; font-weight:600; cursor:pointer; padding:8px 0; }
+
+  input.field{
+    width:100%;
+    padding:13px 14px;
+    border-radius:12px;
+    border:1.4px solid var(--line);
+    font-size:15px;
+    font-family:'Segoe UI', system-ui, sans-serif;
+    margin-bottom:14px;
+    outline:none;
+    color:var(--ink);
+    letter-spacing: 1px;
+  }
+  input.field:focus{ border-color:var(--teal); }
+
+  .muted{ color:var(--muted); font-size:12.5px; line-height:1.5; }
+  .lead{ color:var(--muted); font-size:13px; line-height:1.5; margin-bottom:18px; }
+
+  /* ---- notice card ---- */
+  .notice-card{
+    background:var(--tint);
+    border-radius:16px;
+    padding:16px;
+    margin-bottom:14px;
+  }
+  .notice-row{ display:flex; gap:11px; margin-bottom:13px; align-items:flex-start; }
+  .notice-row:last-child{ margin-bottom:0; }
+  .notice-ic{
+    width:30px;height:30px;border-radius:9px;
+    background:var(--white);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0; font-size:14px;
+  }
+  .notice-row b{ font-size:13px; display:block; margin-bottom:2px;}
+  .notice-row span{ font-size:12px; color:var(--muted); line-height:1.4; }
+
+  .badge{
+    display:inline-block;
+    font-size:9.5px;
+    font-weight:700;
+    letter-spacing:.5px;
+    padding:3px 8px;
+    border-radius:20px;
+    text-transform:uppercase;
+    font-family:'Segoe UI', system-ui, sans-serif;
+  }
+  .badge-mandatory{ background:#F1E4C6; color:var(--lock); }
+  .badge-optional{ background:var(--tint2); color:var(--teal); }
+
+  /* ---- toggle rows ---- */
+  .toggle-card{
+    background:var(--paper);
+    border:1.4px solid var(--line);
+    border-radius:14px;
+    padding:13px 14px;
+    margin-bottom:10px;
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+  }
+  .toggle-card.locked{ background:var(--tint); border-color:var(--tint); }
+  .toggle-left b{ font-size:13.5px; display:block; }
+  .toggle-left .desc{ font-size:11.5px; color:var(--muted); margin-top:2px; display:block; max-width:190px; }
+  .switch{
+    width:44px; height:26px; border-radius:20px; background:#D8E4E4;
+    position:relative; cursor:pointer; flex-shrink:0; transition:background .18s ease;
+    border:none;
+  }
+  .switch.on{ background:var(--seafoam); }
+  .switch.locked{ background:#C9D6D6; cursor:default; }
+  .switch .knob{
+    position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%;
+    background:white; transition:left .18s ease;
+    display:flex;align-items:center;justify-content:center; font-size:10px;
+  }
+  .switch.on .knob{ left:21px; }
+
+  .lockicon{ font-size:11px; }
+
+  /* ---- home ---- */
+  .balance-card{
+    background:linear-gradient(135deg, var(--teal-deep), var(--teal));
+    border-radius:18px;
+    padding:20px;
+    color:white;
+    margin-bottom:18px;
+  }
+  .balance-card .lbl{ font-size:11.5px; opacity:.8; }
+  .balance-card .amt{ font-size:26px; font-weight:700; margin-top:4px; font-family:Georgia,serif; }
+  .quick-actions{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:20px; }
+  .qa-item{ text-align:center; cursor:pointer; }
+  .qa-ic{
+    width:48px;height:48px;border-radius:14px; background:var(--tint);
+    display:flex;align-items:center;justify-content:center; font-size:19px; margin:0 auto 6px;
+  }
+  .qa-item span{ font-size:10.5px; color:var(--ink); font-weight:600; }
+
+  .section-label{ font-size:11.5px; font-weight:700; color:var(--muted); letter-spacing:.6px; text-transform:uppercase; margin:4px 0 10px; }
+
+  .privacy-banner{
+    display:flex; align-items:center; gap:10px;
+    background:var(--tint2); border-radius:14px; padding:12px 13px; margin-bottom:16px; cursor:pointer;
+  }
+  .privacy-banner b{ font-size:12.5px; display:block; }
+  .privacy-banner span{ font-size:11px; color:var(--muted); }
+
+  .bottom-nav{
+    position:absolute; bottom:0; left:0; right:0; height:64px;
+    background:white; border-top:1px solid var(--line);
+    display:flex; align-items:center; justify-content:space-around;
+  }
+  .nav-item{ text-align:center; cursor:pointer; color:var(--muted); }
+  .nav-item.active{ color:var(--teal); }
+  .nav-item .ic{ font-size:17px; }
+  .nav-item div.lbl2{ font-size:9.5px; margin-top:2px; font-weight:600; font-family:'Segoe UI', system-ui, sans-serif;}
+
+  .screen-scroll-pad{ padding-bottom:70px; }
+
+  /* ---- modal ---- */
+  .modal-backdrop{
+    position:absolute; inset:0; background:rgba(11,61,62,0.55);
+    display:none; align-items:flex-end; z-index:20; border-radius:30px;
+  }
+  .modal-backdrop.show{ display:flex; }
+  .modal-sheet{
+    background:white; width:100%; border-radius:22px 22px 0 0; padding:22px 20px 24px;
+    animation: slideUp .22s ease;
+  }
+  @keyframes slideUp{ from{ transform:translateY(30px); opacity:0;} to{ transform:translateY(0); opacity:1;} }
+  .modal-sheet h3{ margin:0 0 6px; font-family:Georgia,serif; font-size:17px; }
+  .partner-list{ display:flex; gap:8px; margin:12px 0 16px; flex-wrap:wrap; }
+  .partner-chip{ background:var(--tint); color:var(--teal); font-size:11px; font-weight:700; padding:6px 10px; border-radius:20px; font-family:'Segoe UI', system-ui, sans-serif; }
+
+  /* toast */
+  .toast{
+    position:absolute; left:16px; right:16px; bottom:80px;
+    background:var(--ink); color:white; padding:12px 14px; border-radius:12px;
+    font-size:12.5px; text-align:center; opacity:0; transform:translateY(8px);
+    transition:all .25s ease; z-index:30; pointer-events:none;
+  }
+  .toast.show{ opacity:1; transform:translateY(0); }
+
+  /* history list */
+  .hist-item{ display:flex; gap:12px; padding:12px 0; border-bottom:1px solid var(--line); }
+  .hist-dot{ width:9px;height:9px;border-radius:50%; margin-top:5px; flex-shrink:0; }
+  .hist-item b{ font-size:12.8px; display:block; }
+  .hist-item .t{ font-size:11px; color:var(--muted); }
+
+  .link-row{ display:flex; align-items:center; justify-content:space-between; padding:13px 4px; border-bottom:1px solid var(--line); cursor:pointer; }
+  .link-row:last-child{ border-bottom:none; }
+  .link-row span{ font-size:13.5px; }
+  .link-row .arrow{ color:var(--muted); }
+
+  .panel-note{ margin-top:16px; padding:12px 13px; background:var(--tint); border-radius:12px; font-size:11.5px; color:var(--teal-deep); line-height:1.5; }
+
+  .caption-below{
+    max-width:340px; margin-top:14px; text-align:center;
+    font-family:'Segoe UI', system-ui, sans-serif;
+    font-size:12px; color:#AEDAD5; line-height:1.5;
+  }
+  .caption-below b{ color:#F4FBFA; }
+
+  .flow-title{
+    font-family:'Segoe UI', system-ui, sans-serif;
+    font-size:11px; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--mint); text-align:center; margin-bottom:8px; font-weight:700;
+  }
+</style>
+</head>
+<body>
+
+<div class="intro">
+  <div class="eyebrow">Clickable Prototype</div>
+  <h1>PaySure — Consent by Design</h1>
+  <p>Tap through the happy path: sign-up → layered consent → home → a just-in-time
+     permission request → the Privacy &amp; Consent Center. Every optional toggle
+     starts OFF, matching the DPDP-aligned architecture in the deck.</p>
+</div>
+
+<div class="rig">
+  <div>
+    <div class="flow-title">Start here</div>
+    <div class="phone">
+      <div class="screen-wrap" id="screenWrap">
+
+        <div class="status-bar">
+          <span>9:41</span>
+          <span>PaySure</span>
+          <span>●●●●</span>
+        </div>
+
+        <!-- 1. WELCOME -->
+        <div class="screen active" id="s-welcome">
+          <div style="height:60px;"></div>
+          <div class="brand-mark">P</div>
+          <div class="screen-title">Welcome to PaySure</div>
+          <p class="lead">UPI payments, bill pay, and loan offers — with data controls you can actually see and use.</p>
+          <div style="position:absolute; bottom:24px; left:20px; right:20px;">
+            <button class="btn btn-primary" onclick="go('s-signup')">Get started</button>
+          </div>
+        </div>
+
+        <!-- 2. SIGN UP -->
+        <div class="screen" id="s-signup">
+          <div class="topbar"><button class="backbtn" onclick="go('s-welcome')">←</button><div class="screen-title">Sign up</div></div>
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <p class="lead">Enter your mobile number to create your PaySure account.</p>
+          <input class="field" value="+91 98 XX XX XX 10" disabled>
+          <button class="btn btn-primary" onclick="go('s-otp')">Continue</button>
+        </div>
+
+        <!-- 3. OTP -->
+        <div class="screen" id="s-otp">
+          <div class="topbar"><button class="backbtn" onclick="go('s-signup')">←</button><div class="screen-title">Verify OTP</div></div>
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+          <p class="lead">Enter the 6-digit code we sent by SMS.</p>
+          <input class="field" value="• • • • • •" disabled style="text-align:center; letter-spacing:6px;">
+          <button class="btn btn-primary" onclick="go('s-essential')">Verify</button>
+        </div>
+
+        <!-- 4. ESSENTIAL NOTICE -->
+        <div class="screen" id="s-essential">
+          <div class="topbar"><div class="screen-title">Before we begin</div></div>
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div></div>
+          <span class="badge badge-mandatory">🔒 Required to use PaySure</span>
+          <p class="lead" style="margin-top:10px;">This is what makes payments work. It's not a marketing consent — just what's needed to verify you and move your money safely.</p>
+          <div class="notice-card">
+            <div class="notice-row">
+              <div class="notice-ic">🪪</div>
+              <div><b>Identity &amp; KYC</b><span>PAN/Aadhaar-linked verification, required by RBI for any payments app.</span></div>
+            </div>
+            <div class="notice-row">
+              <div class="notice-ic">💳</div>
+              <div><b>Payment processing</b><span>Bank &amp; UPI details, used only to complete transactions you initiate.</span></div>
+            </div>
+            <div class="notice-row">
+              <div class="notice-ic">🛡️</div>
+              <div><b>Fraud prevention</b><span>Device &amp; transaction signals, used to keep your account secure.</span></div>
+            </div>
+          </div>
+          <button class="btn-text" onclick="toast('Full legal notice would open here, in your preferred language.')">View full notice &amp; languages →</button>
+          <div style="height:8px;"></div>
+          <button class="btn btn-primary" onclick="go('s-granular')">Continue</button>
+        </div>
+
+        <!-- 5. GRANULAR CONSENT -->
+        <div class="screen" id="s-granular">
+          <div class="topbar"><button class="backbtn" onclick="go('s-essential')">←</button><div class="screen-title">Your choice, up front</div></div>
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div></div>
+          <p class="lead">Everything below is optional and off by default. Turn any of it on now, or later from the Consent Center — it's your call.</p>
+
+          <div class="toggle-card">
+            <div class="toggle-left"><b>Personalization</b><span class="desc">Tailor offers on your home screen to how you use PaySure.</span></div>
+            <button class="switch" id="tg-personal" onclick="flip('tg-personal')"><div class="knob"></div></button>
+          </div>
+          <div class="toggle-card">
+            <div class="toggle-left"><b>Marketing messages</b><span class="desc">Promotions by SMS, email or push. Off means we won't send any.</span></div>
+            <button class="switch" id="tg-marketing" onclick="flip('tg-marketing')"><div class="knob"></div></button>
+          </div>
+          <div class="toggle-card">
+            <div class="toggle-left"><b>Location access</b><span class="desc">Nearby offers and faster fraud checks near your usual places.</span></div>
+            <button class="switch" id="tg-location" onclick="flip('tg-location')"><div class="knob"></div></button>
+          </div>
+          <div class="toggle-card">
+            <div class="toggle-left"><b>Share with lending partners</b><span class="desc">We'll ask again, contextually, only if you open the loan marketplace.</span></div>
+            <button class="switch locked" title="Requested only when relevant"><div class="knob">⏱</div></button>
+          </div>
+
+          <button class="btn btn-primary" onclick="go('s-home'); toast('You are all set. Nothing optional was switched on.')" style="margin-top:6px;">Continue to PaySure</button>
+        </div>
+
+        <!-- 6. HOME -->
+        <div class="screen" id="s-home">
+          <div class="screen-scroll-pad">
+            <div class="topbar" style="justify-content:space-between;">
+              <div class="screen-title">Hi, Meera</div>
+              <div onclick="go('s-consent')" style="cursor:pointer; font-size:18px;">🔔</div>
+            </div>
+            <div class="balance-card">
+              <div class="lbl">Available balance</div>
+              <div class="amt">₹ 24,860</div>
+            </div>
+            <div class="privacy-banner" onclick="go('s-consent')">
+              <div style="font-size:18px;">🛡️</div>
+              <div><b>Your data, on your terms</b><span>2 optional permissions on · tap to manage</span></div>
+              <div style="margin-left:auto; color:var(--muted);">›</div>
+            </div>
+            <div class="section-label">Quick actions</div>
+            <div class="quick-actions">
+              <div class="qa-item"><div class="qa-ic">💸</div><span>Pay</span></div>
+              <div class="qa-item"><div class="qa-ic">🧾</div><span>Bills</span></div>
+              <div class="qa-item" onclick="go('s-loanintro')"><div class="qa-ic">🏦</div><span>Loans</span></div>
+              <div class="qa-item"><div class="qa-ic">⋯</div><span>More</span></div>
+            </div>
+            <div class="section-label">Recent</div>
+            <div class="hist-item"><div class="hist-dot" style="background:var(--seafoam);"></div><div><b>Electricity bill</b><div class="t">Paid · Today</div></div></div>
+            <div class="hist-item"><div class="hist-dot" style="background:var(--seafoam);"></div><div><b>UPI to Arjun K.</b><div class="t">Sent · Yesterday</div></div></div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item active"><div class="ic">🏠</div><div class="lbl2">Home</div></div>
+            <div class="nav-item" onclick="go('s-consent')"><div class="ic">🛡️</div><div class="lbl2">Consent</div></div>
+            <div class="nav-item"><div class="ic">👤</div><div class="lbl2">Profile</div></div>
+          </div>
+        </div>
+
+        <!-- 6b. LOAN INTRO (triggers just-in-time consent) -->
+        <div class="screen" id="s-loanintro">
+          <div class="topbar"><button class="backbtn" onclick="go('s-home')">←</button><div class="screen-title">Loan marketplace</div></div>
+          <p class="lead">Compare pre-approved offers from PaySure's lending partners based on your profile.</p>
+          <div class="toggle-card locked" style="display:block;">
+            <b>🔎 Why we're asking now</b>
+            <span class="desc" style="max-width:100%; display:block; margin-top:4px;">To show relevant offers, we'd share your profile with lending partners. This is the one consent we ask for in the moment, not at sign-up.</span>
+          </div>
+          <button class="btn btn-primary" onclick="openModal()">See loan offers</button>
+          <div class="modal-backdrop" id="loanModal">
+            <div class="modal-sheet">
+              <h3>Share your profile?</h3>
+              <p class="muted">Sharing your KYC summary &amp; repayment history with named lending partners so they can show real offers.</p>
+              <div class="partner-list">
+                <div class="partner-chip">NorthBridge Finance</div>
+                <div class="partner-chip">Suvidha Capital</div>
+                <div class="partner-chip">QuickLend NBFC</div>
+              </div>
+              <button class="btn btn-primary" onclick="allowShare()">Allow &amp; show offers</button>
+              <div style="height:8px;"></div>
+              <button class="btn btn-ghost" onclick="declineShare()">Not now</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7. CONSENT CENTER -->
+        <div class="screen" id="s-consent">
+          <div class="screen-scroll-pad">
+            <div class="topbar"><button class="backbtn" onclick="go('s-home')">←</button><div class="screen-title">Privacy &amp; Consent Center</div></div>
+            <div class="section-label">What we collect &amp; why</div>
+
+            <div class="toggle-card locked">
+              <div class="toggle-left"><b>Payment &amp; KYC <span class="badge badge-mandatory" style="margin-left:6px;">Mandatory</span></b><span class="desc">Required to process payments &amp; meet RBI rules.</span></div>
+              <button class="switch locked"><div class="knob lockicon">🔒</div></button>
+            </div>
+            <div class="toggle-card">
+              <div class="toggle-left"><b>Personalization</b><span class="desc">Tailored offers on your home screen.</span></div>
+              <button class="switch" id="tg2-personal" onclick="flip('tg2-personal'); sync('personal')"><div class="knob"></div></button>
+            </div>
+            <div class="toggle-card">
+              <div class="toggle-left"><b>Marketing messages</b><span class="desc">Promotions by SMS, email or push.</span></div>
+              <button class="switch" id="tg2-marketing" onclick="flip('tg2-marketing'); sync('marketing')"><div class="knob"></div></button>
+            </div>
+            <div class="toggle-card">
+              <div class="toggle-left"><b>Location access</b><span class="desc">Nearby offers, faster fraud checks.</span></div>
+              <button class="switch" id="tg2-location" onclick="flip('tg2-location'); sync('location')"><div class="knob"></div></button>
+            </div>
+            <div class="toggle-card">
+              <div class="toggle-left"><b>Lending-partner sharing</b><span class="desc" id="partner-desc">Not shared yet.</span></div>
+              <button class="switch" id="tg2-partner" onclick="flip('tg2-partner')"><div class="knob"></div></button>
+            </div>
+
+            <div class="section-label" style="margin-top:18px;">Your requests</div>
+            <div class="link-row" onclick="toast('Preparing a downloadable copy of your data…')"><span>⬇️ Download my data</span><span class="arrow">›</span></div>
+            <div class="link-row" onclick="toast('Opens editable KYC & profile fields.')"><span>✏️ Correct my data</span><span class="arrow">›</span></div>
+            <div class="link-row" onclick="go('s-history')"><span>🕘 Consent history</span><span class="arrow">›</span></div>
+            <div class="link-row" onclick="toast('Choose someone to act on your behalf if you\'re unable to.')"><span>🤝 Nominate a successor</span><span class="arrow">›</span></div>
+            <div class="link-row" onclick="go('s-grievance')"><span>🧯 Grievance &amp; security</span><span class="arrow">›</span></div>
+            <div class="link-row" onclick="toast('This starts account & data deletion, with a 30-day confirmation window.')"><span style="color:#B3261E;">🗑️ Delete my account</span><span class="arrow">›</span></div>
+
+            <div class="panel-note">Every toggle here takes effect immediately — turning something off is exactly as easy as turning it on.</div>
+          </div>
+        </div>
+
+        <!-- 8. HISTORY -->
+        <div class="screen" id="s-history">
+          <div class="topbar"><button class="backbtn" onclick="go('s-consent')">←</button><div class="screen-title">Consent history</div></div>
+          <p class="lead">A timestamped, versioned log of everything you've granted or withdrawn.</p>
+          <div class="hist-item"><div class="hist-dot" style="background:var(--seafoam);"></div><div><b>Payment &amp; KYC — granted (mandatory)</b><div class="t">14 Jun 2026, 10:02 · v1.0 notice</div></div></div>
+          <div class="hist-item"><div class="hist-dot" style="background:#D8E4E4;"></div><div><b>Marketing messages — left off</b><div class="t">14 Jun 2026, 10:03 · onboarding</div></div></div>
+          <div class="hist-item"><div class="hist-dot" style="background:var(--seafoam);"></div><div><b>Lending-partner sharing — granted</b><div class="t">2 Jul 2026, 18:41 · just-in-time, loan marketplace</div></div></div>
+          <div class="hist-item"><div class="hist-dot" style="background:#D8E4E4;"></div><div><b>Personalization — withdrawn</b><div class="t">4 Jul 2026, 09:15 · Consent Center</div></div></div>
+        </div>
+
+        <!-- 9. GRIEVANCE -->
+        <div class="screen" id="s-grievance">
+          <div class="topbar"><button class="backbtn" onclick="go('s-consent')">←</button><div class="screen-title">Grievance &amp; security</div></div>
+          <p class="lead">Raise a concern about your data directly with PaySure's Grievance Officer.</p>
+          <div class="notice-card">
+            <div class="notice-row"><div class="notice-ic">⏱️</div><div><b>Response SLA</b><span>Acknowledged within 48 hours, resolved within 7 days.</span></div></div>
+            <div class="notice-row"><div class="notice-ic">📜</div><div><b>Security notices</b><span>No incidents reported in the last 12 months.</span></div></div>
+          </div>
+          <button class="btn btn-primary" onclick="toast('Grievance form would open here.')">Raise a grievance</button>
+        </div>
+
+        <div class="toast" id="toast"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="caption-below">
+  <b>Happy path shown:</b> Sign-up → OTP → mandatory Essential Notice → optional
+  granular toggles (default OFF) → Home → just-in-time consent when opening
+  Loans → Consent Center → withdraw a toggle → audit-logged History.
+</div>
+
+<script>
+  function go(id){
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+  function flip(id){
+    document.getElementById(id).classList.toggle('on');
+  }
+  function sync(kind){
+    // reflect consent-center toggles back onto the onboarding toggle ids for consistency
+    var map = { personal:['tg-personal','tg2-personal'], marketing:['tg-marketing','tg2-marketing'], location:['tg-location','tg2-location'] };
+    var pair = map[kind];
+    var on = document.getElementById(pair[1]).classList.contains('on');
+    var label = kind === 'personal' ? 'Personalization' : kind === 'marketing' ? 'Marketing messages' : 'Location access';
+    toast(label + (on ? ' turned on.' : ' turned off. This takes effect immediately.'));
+  }
+  function openModal(){ document.getElementById('loanModal').classList.add('show'); }
+  function closeModal(){ document.getElementById('loanModal').classList.remove('show'); }
+  function allowShare(){
+    closeModal();
+    document.getElementById('tg2-partner').classList.add('on');
+    document.getElementById('partner-desc').innerText = 'Shared with 3 named lending partners.';
+    go('s-home');
+    toast('Shared with 3 lending partners — manage anytime in Consent Center.');
+  }
+  function declineShare(){
+    closeModal();
+    go('s-home');
+    toast("No problem — you're browsing without sharing your profile.");
+  }
+  let toastTimer;
+  function toast(msg){
+    const t = document.getElementById('toast');
+    t.innerText = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+  }
+</script>
+</body>
+</html>
